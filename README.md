@@ -4,7 +4,7 @@ Workflow Analizer for CI Engines for uiPath projects.
 
 To be used as part of a CI Pipeline:
 -   Copy this project's folder into the Workflow Foundation project's folder.
--   Run the script in this project's root. Alternatively, a folder may be passed as an argument.
+-   Run the script in this project's root. Alternatively, a folder may be passed as an argument. `python3 -m analyzer`
 
 The analysis deliverables will be placed in the `/deliverables` folder.
 
