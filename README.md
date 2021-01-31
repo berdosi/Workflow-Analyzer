@@ -1,6 +1,6 @@
-#   WFAnCIE
+#   Workflow-Analyzer
 
-Workflow Analizer for CI Engines for uiPath projects.
+Workflow Analizer for CI Engines for UiPath projects.
 
 To be used as part of a CI Pipeline:
 -   Copy this project's folder into the Workflow Foundation project's folder.
