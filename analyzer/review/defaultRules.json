@@ -1,0 +1,99 @@
+{
+	"workflows": {
+		"namingConvention": {
+			"pattern": "([A-Z][a-z]+)+[0-9]*.xaml",
+			"maxLength": 25
+		},
+		"maxArguments": 20,
+		"annotationRequired": true,
+		"mustHaveReference": false,
+		"maxActivityCount": 100,
+		"maxNestingLayer": 9
+	},
+	"variables": {
+		"namingConvention": {
+			"pattern": "[a-z]+([A-Z][a-z+])+[0-9]*",
+			"maxLength": 25
+		},
+		"annotationRequired": false,
+		"defaultValueRequired": false
+	},
+	"inArguments": {
+		"namingConvention": {
+			"pattern": "in_[A-Z]?[a-z]+([A-Z][a-z+])+[0-9]*",
+			"maxLength": 25
+		},
+		"annotationRequired": true,
+		"defaultValueRequired": true
+	},
+	"outArguments": {
+		"namingConvention": {
+			"pattern": "out_[A-Z]?[a-z]+([A-Z][a-z+])+[0-9]*",
+			"maxLength": 25
+		},
+		"annotationRequired": true
+	},
+	"ioArguments": {
+		"namingConvention": {
+			"pattern": "io_[A-Z]?[a-z]+([A-Z][a-z+])+[0-9]*",
+			"maxLength": 25
+		},
+		"annotationRequired": true
+	},
+	"activities": {
+		"Sequence": {
+			"defaultName": "Sequence",
+			"allowDefaultName": false,
+			"annotationRequired": false
+		},
+		"Flowchart": {
+			"defaultName": "Flowchart",
+			"allowDefaultName": false,
+			"annotationRequired": false
+		},
+		"StateMachine": {
+			"defaultName": "State Machine",
+			"allowDefaultName": false,
+			"annotationRequired": false
+		},
+		"If": {
+			"defaultName": "If",
+			"allowDefaultName": false,
+			"annotationRequired": false
+		},
+		"ForEach": {
+			"defaultName": "For Each",
+			"allowDefaultName": false,
+			"annotationRequired": false
+		},
+		"DoWhile": {
+			"defaultName": "Do While",
+			"allowDefaultName": false,
+			"annotationRequired": false
+		},
+		"TryCatch": {
+			"defaultName": "Try Catch",
+			"allowDefaultName": false,
+			"annotationRequired": false
+		},
+		"Assign": {
+			"defaultName": "Assign",
+			"allowDefaultName": false
+		},
+		"MultipleAssign": {
+			"defaultName": "Multiple Assign",
+			"allowDefaultName": false
+		},
+		"LogMessage": {},
+		"Delay": {},
+		"InvokeCode": {},
+		"InvokePowerShell": {},
+		"InvokeMacro": {},
+		"InvokeVbScript": {},
+		"InvokeJavaScript": {}
+	},
+	"selectors": {
+		"checkValidXML": true,
+		"checkIdxAttribute": true
+	}
+}
