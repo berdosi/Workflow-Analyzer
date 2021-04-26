@@ -1,6 +1,9 @@
-import xml.etree.ElementTree as ET
+"""Classes representing Workflows, and Workflow parts."""
+
 import re
 from typing import Optional, Iterable
+
+import lxml.etree as ET
 
 default_namespaces = {
     "wf": "http://schemas.microsoft.com/netfx/2009/xaml/activities",
