@@ -90,7 +90,7 @@ class Documentation():
         if workflow != None:
             annotation = workflow.annotation if workflow.annotation != None else ""
             return OUTPUT_TEMPLATE_WF.format(
-                e(workflow.display_name),
+                e(workflow.display_name or ""),
                 e(workflow.file_path),
                 e(annotation),
                 self.render_arguments(workflow.arguments))
