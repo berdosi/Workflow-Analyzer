@@ -8,6 +8,8 @@ Create a folder deliverables/documentation, renders the contents in HTML.
 import logging
 import os
 from html import escape as e
+from typing import Iterable
+
 from analyzer.analyze.project import Project
 from analyzer.analyze.workflow import Workflow, WorkflowArgument
 
@@ -80,7 +82,7 @@ class Documentation():
             os.mkdir(TARGET_DIR)
 
     @staticmethod
-    def render_arguments(arguments: list[WorkflowArgument]) -> str:
+    def render_arguments(arguments: Iterable[WorkflowArgument]) -> str:
         """Generate a document fragment for the arguments of the workflow."""
         render_argument = lambda arg: OUTPUT_TEMPLATE_ARG.format(
             e(arg.name),
