@@ -2,6 +2,15 @@ import xml.etree.ElementTree as ET
 import re
 from typing import Union
 
+default_namespaces = {
+    "wf": "http://schemas.microsoft.com/netfx/2009/xaml/activities",
+    "presentation": "http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation",
+    "presentation2010": "http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation",
+    "this": "clr-namespace:",
+    "ui": "http://schemas.uipath.com/workflow/activities",
+    "x": "http://schemas.microsoft.com/winfx/2006/xaml",
+}
+
 class XamlParser():
     """Common methods used by classes dealing with XAML documents."""
 
@@ -24,17 +33,49 @@ class XamlParser():
     def __init__(self, document: ET.Element):
         self._attribs = document.attrib
 
+class Variable():
+    _element: ET.Element
+    data_type: str
+    default_value: str
+    name: str
+    read_only: bool
+    annotation: str = ""
+
+    def __init__(self, element: ET.Element, namespaces: dict ={}):
+        self._element = element
+        self.data_type = self._get_attribute(f'{{{namespaces["x"]}}}TypeArguments')
+        self.default_value = self._get_attribute(f'Default')
+        self.name = self._get_attribute(f'Name')
+        self.annotation = self._get_attribute(f'{{{namespaces["presentation2010"]}}}Annotation.AnnotationText')
+    
+    def _get_attribute(self, attribute_name: str, fallback_value: str = ""):
+        attrib = self._element.attrib
+        if attribute_name in attrib:
+            return attrib[attribute_name]
+        return fallback_value
+    
+    def __str__(self):
+        return f'<Variable "{self.name}" ({self.data_type}) = "{self.default_value.splitlines()[0]}...">'
 
 class WorkflowArgument(XamlParser):
     """Extract the Argument's properties from the element node"""
-    def __init__(self, argument_element: ET.Element):
-        self._attribs = argument_element.attrib;
+    def __init__(self, argument_element: ET.Element, root_element: ET.Element = None, namespaces= {}):
+        self._attribs = argument_element.attrib
         
         self.annotation = self._get_annotation(argument_element)
         self.name       = self._get_attribute("Name")
         self._raw_type  = self._get_attribute("Type")
         self.direction  = self._get_direction()
         self.type       = self._get_type()
+        
+        # get default value
+        if self.direction == ArgumentDirection.in_arg:
+            default_value = [x 
+                for x in root_element.attrib 
+                if x.endswith(f'.{self.name}') 
+                    and x.startswith('{clr-namespace:}')]
+            if len(default_value) > 0:
+                self.default_value = default_value[0]
 
     def _get_direction(self) -> str:
         if self._raw_type.startswith('InArgument'):
@@ -63,37 +104,52 @@ class ArgumentDirection():
 class Workflow(XamlParser):
     """Represents a workflow file from the project"""
 
+    ns = default_namespaces
+
     def get_annotation(self) -> str:
         """Get the annotation of the top-level Activity from the file."""
         return self._get_annotation(self._root_activity)
 
     def get_referenced_workflows(self): # NOT IMPLEMENTED
         """List the paths of the workflow files referenced by this file."""
-        raise NotImplementedError
+        pass
 
     def get_arguments(self) -> list[WorkflowArgument]:
         """List the Arguments of the workflow."""
         return list(map(
             lambda argNode: WorkflowArgument(argNode),
-            self.document
-                .findall("./{*}Members/{*}Property")))
+            self.document.findall(
+                "./x:Members/x:Property",
+                namespaces=self.ns)))
+
+    def get_variables(self) -> list[Variable]:
+        return map(
+            lambda varNode: Variable(varNode, self.ns),
+            self.document.findall(
+                './/wf:Variable',
+                namespaces=self.ns))
 
     def get_root_activity(self) -> Union[ET.Element, None]:
-        """The Activity should have a StateMachine, Flowchart or Sequence as 
-        its child."""
-        root_activity = self.document.find('./{*}StateMachine')
-        if None == root_activity:
-            root_activity = self.document.find('./{*}Flowchart')
-        if None == root_activity:
-            root_activity = self.document.find('./{*}Sequence')
-        return root_activity
+        """The Activity should have a StateMachine, Flowchart or Sequence as its child.
+        
+        This is usually a Sequence, Flowcart, or StateMachine, however other root elements are possible.
+        As finding all of them is not in scope for now, this activity detects the first one that doesn't contain
+        'TextExpression' instead.
+        """
+        toplevel_elements = self.document.findall('./wf:*', namespaces=self.ns)
+        for child in toplevel_elements:
+            if not 'TextExpression' in child.tag:
+                return child
+        return None
 
     def __init__(self, file_path):
         self.file_path = file_path
-        self.document = ET.parse(open(file_path))
+        self.document: ET = ET.parse(open(file_path))
         self._root_activity = self.get_root_activity()
         self._attribs = self._root_activity.attrib
 
         self.annotation = self.get_annotation()
         self.arguments = self.get_arguments()
+        self.variables = self.get_variables()
+        self.referenced_workflows = self.get_referenced_workflows()
         self.display_name = self._get_attribute('DisplayName')
