@@ -1,3 +1,5 @@
+"""Entry module for the Analyzer."""
+
 import logging
 import os.path
 import sys
@@ -6,6 +8,7 @@ from analyzer.analyze.project import Project
 from analyzer.render.documentation import Documentation
 
 def main(argv):
+    """Entry point for the Analyzer: find the target folder, read project, generate output."""
     logging.basicConfig(level=logging.INFO)
     if len(argv) != 1:
         logging.info(
@@ -13,7 +16,7 @@ def main(argv):
         target_dir = os.path.realpath('..')
     else:
         target_dir = argv[0]
-    logging.info(f'Target directory is {target_dir}')
+    logging.info('Target directory is %s', target_dir)
 
     project = Project(target_dir)
 
