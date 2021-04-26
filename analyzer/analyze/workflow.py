@@ -2,7 +2,7 @@
 
 import re
 from dataclasses import dataclass
-from typing import Optional, Iterable
+from typing import Optional, Iterable, Callable
 
 import lxml.etree as ET
 
@@ -169,6 +169,25 @@ class Workflow(XamlParser):
             if not 'TextExpression' in child.tag:
                 return child
         return None
+
+    def get_elements_with_selectors(self) -> Iterable[ET.Element]:
+        """Find the elements on which the selector checks may be done.
+
+        These elements may be Target attribute of an activity.
+
+        In this case, return the first ancestor for which the name doesn't end with Target.
+        """
+
+        elements_with_selectors: Iterable[ET.Element] = self.document.findall('.//*[@Selector]')
+        is_target: Callable[[], bool] = lambda element: element.tag.endswith('Target')
+
+        return map(
+            lambda element: (element
+                if not is_target(element)
+                else (ancestor
+                    for ancestor in element.iterancestors()
+                    if not is_target(ancestor)).__next__()),
+            elements_with_selectors)
 
     def __init__(self, file_path):
         self.file_path = file_path
