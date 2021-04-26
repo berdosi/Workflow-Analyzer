@@ -39,7 +39,9 @@ class Project():
 
         #  these fields can be missing in case of a template, like ReFramework.
         self.name = properties['name'] if 'name' in properties else "MISSING NAME"
-        self.version = properties['projectVersion'] if 'projectVersion' in properties else "MISSING VERSION"
+        self.version = (properties['projectVersion']
+            if 'projectVersion' in properties
+            else "MISSING VERSION")
         self.description = properties['description']
 
         if 'projectType' in properties:
