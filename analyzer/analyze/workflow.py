@@ -113,7 +113,7 @@ class Workflow(XamlParser):
 
     def get_referenced_workflows(self) -> Iterable[str]:
         """List the paths of the workflow files referenced by this file."""
-        invoke_activities = self.get_root_activity().findall('.//ui:InvokeWorkflowFile', self.ns)
+        invoke_activities = self.get_root_activity().iterfind('.//ui:InvokeWorkflowFile', self.ns)
         return map(
             lambda invoke_activity: str(invoke_activity.attrib['WorkflowFileName']).replace('\\', '/'),
             invoke_activities)
@@ -122,14 +122,14 @@ class Workflow(XamlParser):
         """List the Arguments of the workflow."""
         return map(
             lambda argNode: WorkflowArgument(argNode, self.document.getroot()),
-            self.document.findall(
+            self.document.iterfind(
                 "./x:Members/x:Property",
                 namespaces=self.ns))
 
     def get_variables(self) -> Iterable[Variable]:
         return map(
             lambda varNode: Variable(varNode, self.ns),
-            self.document.findall(
+            self.document.iterfind(
                 './/wf:Variable',
                 namespaces=self.ns))
 
@@ -140,7 +140,7 @@ class Workflow(XamlParser):
         As finding all of them is not in scope for now, this activity detects the first one that doesn't contain
         'TextExpression' instead.
         """
-        toplevel_elements = self.document.findall('./wf:*', namespaces=self.ns)
+        toplevel_elements = self.document.iterfind('./wf:*', namespaces=self.ns)
         for child in toplevel_elements:
             if not 'TextExpression' in child.tag:
                 return child
