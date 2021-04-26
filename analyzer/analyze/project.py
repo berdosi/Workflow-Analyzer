@@ -4,7 +4,7 @@ import glob
 import json.decoder
 import os.path
 from dataclasses import dataclass
-from typing import Any, Iterable
+from typing import Any, Iterable, Dict
 import logging
 
 from analyzer.analyze.workflow import Workflow
@@ -13,7 +13,7 @@ from analyzer.analyze.workflow import Workflow
 class Project():
     """Represent an entire UiPath project being analysed."""
     @staticmethod
-    def get_project_properties(target_dir: str) -> dict[str, Any]:
+    def get_project_properties(target_dir: str) -> Dict[str, Any]:
         """Read the project.json file."""
         project_file = os.path.join(target_dir, 'project.json')
         if os.path.exists(project_file):

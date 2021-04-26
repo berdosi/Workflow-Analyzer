@@ -2,7 +2,7 @@
 
 import re
 from dataclasses import dataclass
-from typing import Optional, Iterable, Callable
+from typing import Optional, Iterable, Callable, Dict
 
 import lxml.etree as ET
 
@@ -74,7 +74,7 @@ class Variable():
 class WorkflowArgument(XamlParser):
     """Extract the Argument's properties from the element node"""
     def __init__(self, argument_element: ET.Element, root_element: ET.Element,
-            namespaces: dict[str, str] = None):
+            namespaces: Dict[str, str] = None):
         if namespaces is None:
             namespaces = {}
         super().__init__(argument_element)
