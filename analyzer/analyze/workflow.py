@@ -1,6 +1,6 @@
 import xml.etree.ElementTree as ET
 import re
-from typing import Union
+from typing import Optional, Iterable
 
 default_namespaces = {
     "wf": "http://schemas.microsoft.com/netfx/2009/xaml/activities",
@@ -13,21 +13,22 @@ default_namespaces = {
 
 class XamlParser():
     """Common methods used by classes dealing with XAML documents."""
+    namespaces = default_namespaces
 
-    def _get_attribute(self, attribute_name: str) -> Union[str, None]:
+    def _get_attribute(self, attribute_name: str) -> Optional[str]:
         if attribute_name in self._attribs:
             return self._attribs[attribute_name]
         return None
 
-    def _remove_namespace_from_type_string(self, type_string):
+    def _remove_namespace_from_type_string(self, type_string) -> str:
         "Remove namespace annotations from type strings, Element names, etc."
         namespace_regex = re.compile(r'[a-z]+:')
         return namespace_regex.sub('', type_string)
 
-    def _get_annotation(self, element: ET.Element) -> Union[str, None]:
+    def _get_annotation(self, element: ET.Element) -> Optional[str]:
         """Annotation attribute names with their namespaces are just too long."""
         annotation_attrib_name = (
-            '{http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation}Annotation.AnnotationText')
+            f'{{{self.namespaces["presentation2010"]}}}Annotation.AnnotationText')
         return self._get_attribute(annotation_attrib_name)
 
     def __init__(self, document: ET.Element):
@@ -59,7 +60,7 @@ class Variable():
 
 class WorkflowArgument(XamlParser):
     """Extract the Argument's properties from the element node"""
-    def __init__(self, argument_element: ET.Element, root_element: ET.Element = None, namespaces= {}):
+    def __init__(self, argument_element: ET.Element, root_element: ET.Element, namespaces= {}):
         self._attribs = argument_element.attrib
         
         self.annotation = self._get_annotation(argument_element)
@@ -110,26 +111,29 @@ class Workflow(XamlParser):
         """Get the annotation of the top-level Activity from the file."""
         return self._get_annotation(self._root_activity)
 
-    def get_referenced_workflows(self): # NOT IMPLEMENTED
+    def get_referenced_workflows(self) -> Iterable[str]:
         """List the paths of the workflow files referenced by this file."""
-        pass
+        invoke_activities = self.get_root_activity().findall('.//ui:InvokeWorkflowFile', self.ns)
+        return map(
+            lambda invoke_activity: str(invoke_activity.attrib['WorkflowFileName']).replace('\\', '/'),
+            invoke_activities)
 
-    def get_arguments(self) -> list[WorkflowArgument]:
+    def get_arguments(self) -> Iterable[WorkflowArgument]:
         """List the Arguments of the workflow."""
-        return list(map(
-            lambda argNode: WorkflowArgument(argNode),
+        return map(
+            lambda argNode: WorkflowArgument(argNode, self.document.getroot()),
             self.document.findall(
                 "./x:Members/x:Property",
-                namespaces=self.ns)))
+                namespaces=self.ns))
 
-    def get_variables(self) -> list[Variable]:
+    def get_variables(self) -> Iterable[Variable]:
         return map(
             lambda varNode: Variable(varNode, self.ns),
             self.document.findall(
                 './/wf:Variable',
                 namespaces=self.ns))
 
-    def get_root_activity(self) -> Union[ET.Element, None]:
+    def get_root_activity(self) -> Optional[ET.Element]:
         """The Activity should have a StateMachine, Flowchart or Sequence as its child.
         
         This is usually a Sequence, Flowcart, or StateMachine, however other root elements are possible.
