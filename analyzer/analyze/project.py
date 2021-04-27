@@ -1,22 +1,27 @@
 """Contains Project to represent an entire UiPath project being analysed."""
 
-import glob
+from glob import glob
 import json.decoder
-import os.path
+from os.path import join, dirname, exists
 from dataclasses import dataclass
 from typing import Any, Iterable, Dict
 import logging
 
 from analyzer.analyze.workflow import Workflow
 
+# As the analyzer can be checked out within the to-be-analyzed project,
+# its own test files are to be excluded from the direcetory listing.
+TEST_ASSET_DIR = '/tests/assets'
+
 @dataclass
 class Project():
     """Represent an entire UiPath project being analysed."""
+
     @staticmethod
     def get_project_properties(target_dir: str) -> Dict[str, Any]:
         """Read the project.json file."""
-        project_file = os.path.join(target_dir, 'project.json')
-        if os.path.exists(project_file):
+        project_file = join(target_dir, 'project.json')
+        if exists(project_file):
             return json.load(open(project_file))
 
         raise FileNotFoundError('No project.json found - not a valid project folder.')
@@ -26,11 +31,12 @@ class Project():
         return (file_name
             for file_name
             in
-                glob.glob(
-                    os.path.join(
+                glob(
+                    join(
                         self.project_directory,
                         './**/*.xaml'),
-                    recursive=True))
+                    recursive=True)
+                if not dirname(file_name).endswith(TEST_ASSET_DIR))
 
     def __init__(self, project_directory):
         logging.basicConfig(level=logging.INFO)
