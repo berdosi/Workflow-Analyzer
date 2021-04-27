@@ -10,8 +10,8 @@ import os
 from html import escape as e
 from typing import Iterable
 
-from analyze.project import Project
-from analyze.workflow import Workflow, WorkflowArgument
+from analyzer.analyze.project import Project
+from analyzer.analyze.workflow import Workflow, WorkflowArgument
 
 TARGET_DIR  = './deliverables/documentation'
 TARGET_FILE = 'Documentation.html'
