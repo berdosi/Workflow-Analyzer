@@ -22,4 +22,5 @@ jobs:
           cd ReFrameWork
           git clone https://github.com/berdosi/Workflow-Analyzer.git
           cd Workflow-Analyzer
+          pip3 -i requirements.txt
           python3 -m analyzer ../
