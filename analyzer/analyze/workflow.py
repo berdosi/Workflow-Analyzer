@@ -191,7 +191,8 @@ class Workflow(XamlParser):
 
     def __init__(self, file_path):
         self.file_path = file_path
-        self.document: ET = ET.parse(open(file_path))
+        parser = ET.XMLParser(recover=True, resolve_entities=False)
+        self.document: ET = ET.parse(open(file_path), parser=parser)
         self._root_activity = self.get_root_activity()
         self._attribs = self._root_activity.attrib
 
