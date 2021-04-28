@@ -43,7 +43,8 @@ class TestCase():
         if not self.__validate_result(self.result):
             raise ValueError
 
-        self.root_element = Element("test-case", case_id=self.case_id, name=self.name, result=self.result)
+        self.root_element = Element(
+            "test-case", case_id=self.case_id, name=self.name, result=self.result)
         if not self.failure is None:
             self.failure = CaseFailure(self.failure)
             self.root_element.append(self.failure.root_element)
@@ -53,7 +54,7 @@ class CaseContainer(ABC):
     """Represents ny element in the test-run that can contain test cases."""
     root_element: ElementBase
     cases_contained: Iterable[TestCase] = field(default_factory=list)
-    
+
     def add_case(self, case: TestCase):
         """Add a case to the data model as well as the XML."""
         self.cases_contained.append(case)
