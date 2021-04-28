@@ -60,4 +60,5 @@ class Project():
             self.main = properties['main']
 
         # This assumes that each .xaml file can be processed as a workflow
-        self.workflow_files = (Workflow(file_path) for file_path in self.get_workflow_files())
+        self.workflow_files: Iterable[Workflow] = (
+            Workflow(file_path) for file_path in self.get_workflow_files())
