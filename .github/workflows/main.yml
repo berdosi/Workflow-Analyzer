@@ -19,12 +19,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      
-      - name: Install Dependencies
+
+      - name: Install Dev Dependencies
+        run: pip3 install -r requirements-dev.txt
+
+      - name: Install Project Dependencies
         run: pip3 install -r requirements.txt
-  
+
       - name: Run PyTest
         run: python3 -m pytest --cov=analyzer
-        
+
       - name: Run Pylint
         run: python3 -m pylint *

@@ -1,0 +1,4 @@
+# these modules are used for CI/CD testing the project itself
+pytest >= 6.2.3
+pylint >= 2.8.1
+pytest-cov >= 2.11.1 
