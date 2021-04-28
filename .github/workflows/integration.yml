@@ -24,3 +24,7 @@ jobs:
           cd Workflow-Analyzer
           pip3 install -r requirements.txt
           python3 -m analyzer ../
+      - uses: actions/upload-artifact@v2
+        with:
+          name: Documentation
+          path: ReFrameWork/Workflow-Analyzer/deliverables/documentation/Documentation.html
