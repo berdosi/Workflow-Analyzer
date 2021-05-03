@@ -189,7 +189,7 @@ class Workflow(XamlParser):
                     if not is_target(ancestor)).__next__()),
             elements_with_selectors)
 
-    def __init__(self, file_path):
+    def __init__(self, file_path: str):
         self.file_path = file_path
         parser = ET.XMLParser(recover=True, resolve_entities=False)
         self.document: ET = ET.parse(open(file_path), parser=parser)
